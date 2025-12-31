@@ -4,303 +4,473 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Early Warning Signals – Decision Support (Prototype)</title>
-
   <style>
-    :root{
-      --bg:#f6f8fc;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --line:#e5e7eb;
-
-      --good:#16a34a;
-      --warn:#f59e0b;
-      --bad:#dc2626;
-      --info:#2563eb;
-    }
+:root{
+  --bg:#f6f8fc;
+  --card:#ffffff;
+  --muted:#64748b;
+  --text:#0f172a;
+  --line:#e5e7eb;
+  --good:#16a34a;
+  --warn:#f59e0b;
+  --bad:#dc2626;
+  --info:#2563eb;
+}
 
     *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Arial;
-    }
-
-    header{
-      padding:20px 16px;
-      border-bottom:1px solid var(--line);
-      background:#ffffff;
-      position:sticky;
-      top:0;
-      z-index:10;
-    }
-
+    body{margin:0;background:linear-gradient(180deg,#071024,#0b1220);color:var(--text);font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    a{color:inherit}
+    header{padding:22px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,18,32,.85);backdrop-filter:blur(10px);z-index:10}
     .wrap{max-width:1100px;margin:0 auto}
-
-    h1{margin:0;font-size:18px}
-    .sub{margin-top:6px;color:var(--muted)}
-
-    main{padding:20px 16px 40px}
-
-    .grid{
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:16px;
-    }
-
-    @media (max-width:900px){
-      .grid{grid-template-columns:1fr}
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:16px;
-    }
-
-    .card h2{
-      margin:0 0 12px;
-      font-size:14px;
-      color:#0f172a;
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 160px;
-      gap:12px;
-      align-items:center;
-      padding:12px 0;
-      border-top:1px solid var(--line);
-    }
-
+    .title{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .sub{margin:6px 0 0;color:var(--muted);max-width:850px}
+    main{padding:18px 16px 40px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:rgba(15,26,46,.9);border:1px solid var(--line);border-radius:14px;padding:14px}
+    .card h2{margin:0 0 10px;font-size:14px}
+    .row{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;padding:10px;border-top:1px solid var(--line)}
     .row:first-of-type{border-top:none}
-
-    .hint{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:2px;
-    }
-
-    select,input,textarea{
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:#ffffff;
-      color:var(--text);
-    }
-
-    textarea{resize:vertical;min-height:80px}
-
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:14px;
-    }
-
-    button{
-      padding:10px 14px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:#ffffff;
-      cursor:pointer;
-    }
-
-    button.primary{
-      background:var(--info);
-      color:#ffffff;
-      border:none;
-    }
-
-    .kpis{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-    }
-
-    .kpi{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:12px;
-      background:#f9fafb;
-    }
-
-    .kpi .name{font-size:12px;color:var(--muted)}
+    .label{display:flex;gap:8px;align-items:flex-start}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:12px;white-space:nowrap}
+    .hint{color:var(--muted);font-size:12px;margin-top:2px}
+    select,input,textarea{width:100%;background:#0b1427;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;outline:none}
+    textarea{min-height:80px;resize:vertical}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    button{cursor:pointer;border:1px solid var(--line);background:#0b1427;color:var(--text);padding:10px 12px;border-radius:12px}
+    button.primary{background:linear-gradient(90deg,#2563eb,#60a5fa);border:none}
+    button.ghost{background:transparent}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media (max-width:520px){.kpis{grid-template-columns:1fr}}
+    .kpi{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(11,20,39,.7)}
+    .kpi .name{color:var(--muted);font-size:12px}
     .kpi .val{font-size:22px;font-weight:700;margin-top:4px}
-
-    .status{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:12px;
-      margin-top:14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#f9fafb;
-    }
-
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      margin-top:4px;
-    }
-
+    .status{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:rgba(11,20,39,.7)}
+    .dot{width:10px;height:10px;border-radius:50%}
     .dot.good{background:var(--good)}
     .dot.warn{background:var(--warn)}
     .dot.bad{background:var(--bad)}
     .dot.info{background:var(--info)}
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-    }
-
-    th,td{
-      padding:10px;
-      border-bottom:1px solid var(--line);
-      text-align:left;
-    }
-
-    th{
-      font-size:12px;
-      color:var(--muted);
-      background:#f9fafb;
-    }
-
-    footer{
-      border-top:1px solid var(--line);
-      padding:16px;
-      color:var(--muted);
-      background:#ffffff;
-    }
+    .pill{display:inline-flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .pill span{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);background:rgba(11,20,39,.55)}
+    table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px;border:1px solid var(--line)}
+    th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);font-weight:600;background:rgba(11,20,39,.65)}
+    tr:last-child td{border-bottom:none}
+    .small{font-size:12px;color:var(--muted)}
+    footer{padding:18px 16px;color:var(--muted);border-top:1px solid var(--line)}
   </style>
 </head>
 
 <body>
-
-<header>
-  <div class="wrap">
-    <h1>Early Warning Signals – Decision Support (Prototype)</h1>
-    <div class="sub">
-      A lightweight tool to help project teams interpret early warning signals
-      and decide when escalation is required.
+  <header>
+    <div class="wrap">
+      <div class="title">
+        <div>
+          <h1>Early Warning Signals – Decision Support (Prototype)</h1>
+          <p class="sub">
+            A simple, human-in-the-loop tool to help project teams <b>interpret</b> early warning signals and decide
+            <b>when to escalate</b>. Select ratings, capture evidence, and generate an escalation recommendation.
+          </p>
+        </div>
+        <div class="badge" title="Prototype UI only">⚡ Prototype</div>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<main>
-  <div class="wrap grid">
+  <main>
+    <div class="wrap grid">
 
-    <!-- INPUT -->
-    <section class="card">
-      <h2>Capture Early Warning Signals</h2>
+      <!-- LEFT: INPUTS -->
+      <section class="card" aria-label="Inputs">
+        <h2>1) Capture Early Warning Signals</h2>
 
-      <div class="row">
-        <div>
-          <b>Project Name</b>
-          <div class="hint">Optional reference</div>
+        <!-- Project meta -->
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Project / Work Package</b></div>
+              <div class="hint">Optional label to keep records organized.</div>
+            </div>
+          </div>
+          <input id="projectName" placeholder="e.g., Offshore module upgrade – Package A" />
         </div>
-        <input placeholder="Project Alpha – Phase 2" />
-      </div>
 
-      <div class="row">
-        <div>
-          <b>Schedule Stress</b>
-          <div class="hint">Minor slippage, buffer erosion</div>
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Assessor Experience Level</b></div>
+              <div class="hint">Used only for reporting / weighting if desired.</div>
+            </div>
+          </div>
+          <select id="experience">
+            <option value="junior">Junior (0–3 yrs)</option>
+            <option value="mid" selected>Intermediate (3–10 yrs)</option>
+            <option value="senior">Senior (10+ yrs)</option>
+          </select>
         </div>
-        <select>
-          <option>1 – Stable</option>
-          <option>2 – Minor</option>
-          <option selected>3 – Emerging</option>
-          <option>4 – Serious</option>
-          <option>5 – Critical</option>
-        </select>
-      </div>
 
-      <div class="row">
-        <div>
-          <b>Rework / Quality Drift</b>
-          <div class="hint">Repeated clarifications</div>
+        <!-- Signal dimensions (basic parameters) -->
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Schedule Stress</b> <span class="badge">leading indicator</span></div>
+              <div class="hint">Recurring minor slippages, buffer erosion, repeated re-planning.</div>
+            </div>
+          </div>
+          <select class="score" data-dim="schedule">
+            <option value="1">1 – Stable</option>
+            <option value="2">2 – Minor noise</option>
+            <option value="3" selected>3 – Emerging concern</option>
+            <option value="4">4 – Serious warning</option>
+            <option value="5">5 – Critical</option>
+          </select>
         </div>
-        <select>
-          <option>1 – Stable</option>
-          <option>2 – Minor</option>
-          <option selected>3 – Emerging</option>
-          <option>4 – Serious</option>
-          <option>5 – Critical</option>
-        </select>
-      </div>
 
-      <div class="row">
-        <div>
-          <b>Decision Delay / Escalation Hesitation</b>
-          <div class="hint">Issues repeatedly deferred</div>
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Rework / Quality Drift</b></div>
+              <div class="hint">Repeat clarifications, rework loops, “accept with conditions”.</div>
+            </div>
+          </div>
+          <select class="score" data-dim="quality">
+            <option value="1">1 – Stable</option>
+            <option value="2">2 – Minor noise</option>
+            <option value="3" selected>3 – Emerging concern</option>
+            <option value="4">4 – Serious warning</option>
+            <option value="5">5 – Critical</option>
+          </select>
         </div>
-        <select>
-          <option>1 – Timely</option>
-          <option>2 – Slight delay</option>
-          <option selected>3 – Repeated deferral</option>
-          <option>4 – Avoided</option>
-          <option>5 – Paralysis</option>
-        </select>
-      </div>
 
-      <div class="row">
-        <div>
-          <b>Notes</b>
-          <div class="hint">Evidence or observations</div>
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Communication Clarity</b></div>
+              <div class="hint">Vague updates, key info not in formal channels, “green” reporting culture.</div>
+            </div>
+          </div>
+          <select class="score" data-dim="communication">
+            <option value="1">1 – Clear & transparent</option>
+            <option value="2">2 – Slightly unclear</option>
+            <option value="3" selected>3 – Noticeable ambiguity</option>
+            <option value="4">4 – Hidden issues likely</option>
+            <option value="5">5 – Severe opacity</option>
+          </select>
         </div>
-        <textarea placeholder="Describe what you are seeing..."></textarea>
-      </div>
 
-      <div class="actions">
-        <button class="primary">Analyze</button>
-        <button>Clear</button>
-      </div>
-    </section>
-
-    <!-- OUTPUT -->
-    <aside class="card">
-      <h2>Interpretation & Escalation</h2>
-
-      <div class="kpis">
-        <div class="kpi">
-          <div class="name">Early Warning Index</div>
-          <div class="val">—</div>
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Stakeholder Engagement</b></div>
+              <div class="hint">Late feedback, meeting absence, delayed approvals, silent disagreement.</div>
+            </div>
+          </div>
+          <select class="score" data-dim="stakeholder">
+            <option value="1">1 – Highly engaged</option>
+            <option value="2">2 – Mostly engaged</option>
+            <option value="3" selected>3 – Engagement dropping</option>
+            <option value="4">4 – High misalignment risk</option>
+            <option value="5">5 – Disengaged / blocking</option>
+          </select>
         </div>
-        <div class="kpi">
-          <div class="name">Confidence</div>
-          <div class="val">—</div>
+
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Decision Delay / Escalation Hesitation</b> <span class="badge">core focus</span></div>
+              <div class="hint">Issues deferred, waiting for certainty, unclear authority, fear of blame.</div>
+            </div>
+          </div>
+          <select class="score" data-dim="escalation">
+            <option value="1">1 – Decisions timely</option>
+            <option value="2">2 – Slight delays</option>
+            <option value="3" selected>3 – Repeated deferrals</option>
+            <option value="4">4 – Escalation avoided</option>
+            <option value="5">5 – Decision paralysis</option>
+          </select>
         </div>
-        <div class="kpi">
-          <div class="name">Urgency</div>
-          <div class="val">—</div>
+
+        <div class="row">
+          <div class="label">
+            <div>
+              <div><b>Evidence / Notes</b></div>
+              <div class="hint">Write short facts: what happened, where, when, who was involved.</div>
+            </div>
+          </div>
+          <textarea id="notes" placeholder="e.g., Two consecutive weeks of rework on interface drawings; approvals delayed 6 days; stakeholder skipped review meeting."></textarea>
         </div>
-      </div>
 
-      <div class="status">
-        <span class="dot info"></span>
-        <div>
-          <b>No analysis yet</b>
-          <div class="hint">Run analysis to get recommendation</div>
+        <div class="actions">
+          <button class="primary" id="analyzeBtn">Analyze & Recommend Escalation</button>
+          <button class="ghost" id="saveBtn" title="Saves entry to this browser (localStorage)">Save Record</button>
+          <button class="ghost" id="clearBtn">Clear</button>
+          <span class="small">No backend. Data stays on your browser.</span>
         </div>
-      </div>
-    </aside>
+      </section>
 
-  </div>
-</main>
+      <!-- RIGHT: OUTPUTS -->
+      <aside class="card" aria-label="Outputs">
+        <h2>2) Interpretation & Escalation Recommendation</h2>
 
-<footer>
-  <div class="wrap">
-    © 2025–2026 Fang Yu · Early Warning Decision Support Prototype
-  </div>
-</footer>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="name">Early Warning Index</div>
+            <div class="val" id="ewi">—</div>
+            <div class="small">0–100 (higher = more warning)</div>
+          </div>
+          <div class="kpi">
+            <div class="name">Confidence Level</div>
+            <div class="val" id="confidence">—</div>
+            <div class="small">Based on signal consistency</div>
+          </div>
+          <div class="kpi">
+            <div class="name">Escalation Urgency</div>
+            <div class="val" id="urgency">—</div>
+            <div class="small">Suggested action window</div>
+          </div>
+        </div>
 
+        <div style="margin-top:12px" class="status" id="statusBox">
+          <span class="dot info" id="statusDot"></span>
+          <div>
+            <div><b id="statusTitle">No analysis yet</b></div>
+            <div class="small" id="statusDesc">Select values and click “Analyze”.</div>
+          </div>
+        </div>
+
+        <div class="pill" id="insights">
+          <span>Top signals will appear here</span>
+        </div>
+
+        <div style="margin-top:12px">
+          <h2 style="margin-top:0">3) Suggested Escalation Path</h2>
+          <div class="small" id="path">
+            Run analysis to generate a recommended escalation route (e.g., Team Lead → PM → Steering Committee).
+          </div>
+        </div>
+      </aside>
+
+      <!-- FULL WIDTH: HISTORY -->
+      <section class="card" style="grid-column:1/-1" aria-label="History">
+        <h2>Saved Records</h2>
+        <div class="small" style="margin-bottom:10px">
+          Each saved record captures your ratings, notes, and computed recommendation for traceability.
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:160px">Timestamp</th>
+              <th style="width:220px">Project</th>
+              <th style="width:120px">EWI</th>
+              <th style="width:200px">Status</th>
+              <th>Notes (snippet)</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr>
+              <td colspan="5" class="small">No saved records yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div>© 2025–2026 Fang Yu</div>
+      <div class="small">Prototype UI for understanding early warning interpretation & escalation concepts.</div>
+    </div>
+  </footer>
+
+  <script>
+    // --- Basic demo logic (kept inside index.html for clarity) ---
+    const dims = ["schedule","quality","communication","stakeholder","escalation"];
+    const labels = {
+      schedule: "Schedule Stress",
+      quality: "Rework / Quality Drift",
+      communication: "Communication Clarity",
+      stakeholder: "Stakeholder Engagement",
+      escalation: "Decision Delay / Escalation Hesitation"
+    };
+
+    function readScores(){
+      const scores = {};
+      document.querySelectorAll(".score").forEach(sel=>{
+        scores[sel.dataset.dim] = parseInt(sel.value, 10);
+      });
+      return scores;
+    }
+
+    function computeEWI(scores){
+      // Simple weighted example (you can change weights later)
+      const w = { schedule: 0.18, quality: 0.22, communication: 0.18, stakeholder: 0.18, escalation: 0.24 };
+      let s = 0;
+      for (const k of dims) s += scores[k] * w[k];
+      // Normalize 1–5 => 0–100
+      return Math.round(((s - 1) / 4) * 100);
+    }
+
+    function topSignals(scores){
+      return Object.entries(scores)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,3);
+    }
+
+    function classify(scores, ewi){
+      const max = Math.max(...Object.values(scores));
+      const avg = Object.values(scores).reduce((a,b)=>a+b,0)/dims.length;
+      const spread = Math.abs(max - avg);
+      const confidence = spread < 1.1 ? "High" : (spread < 1.8 ? "Medium" : "Low");
+
+      let statusTitle, statusDesc, dotClass, urgency;
+
+      if (ewi < 35){
+        statusTitle = "Monitor (No immediate escalation)";
+        statusDesc = "Signals appear within normal variability. Keep tracking weekly and document evidence.";
+        dotClass = "good";
+        urgency = "Within 2–4 weeks";
+      } else if (ewi < 65){
+        statusTitle = "Attention (Prepare escalation)";
+        statusDesc = "Signals suggest emerging issues. Clarify severity and escalate to PM if trend persists.";
+        dotClass = "warn";
+        urgency = "Within 1–2 weeks";
+      } else {
+        statusTitle = "Escalate Now (High risk of late intervention)";
+        statusDesc = "Signals indicate significant risk. Escalate with evidence and request decision / support.";
+        dotClass = "bad";
+        urgency = "Within 24–72 hours";
+      }
+
+      // If escalation dimension itself is high, push urgency
+      if (scores.escalation >= 4 && ewi >= 55){
+        statusDesc += " Escalation hesitation is itself a critical warning—use a formal channel.";
+        urgency = "Within 24–48 hours";
+      }
+
+      return { statusTitle, statusDesc, dotClass, urgency, confidence };
+    }
+
+    function escalationPath(scores, ewi){
+      // Simple routing suggestion
+      if (ewi < 35) return "Team Lead → Weekly stand-up review (document signals; no formal escalation yet).";
+      if (ewi < 65) return "Team Lead → Project Manager → Risk/Issue log update → Targeted stakeholder alignment call.";
+      return "Project Manager → Steering Committee / Sponsor → Immediate decision on resources, scope, or schedule recovery.";
+    }
+
+    function renderInsights(top3){
+      const box = document.getElementById("insights");
+      box.innerHTML = "";
+      top3.forEach(([k,v], idx)=>{
+        const span = document.createElement("span");
+        span.textContent = `${idx+1}. ${labels[k]}: ${v}/5`;
+        box.appendChild(span);
+      });
+    }
+
+    function setStatusUI(res){
+      document.getElementById("statusTitle").textContent = res.statusTitle;
+      document.getElementById("statusDesc").textContent = res.statusDesc;
+
+      const dot = document.getElementById("statusDot");
+      dot.className = "dot " + res.dotClass;
+
+      document.getElementById("urgency").textContent = res.urgency;
+      document.getElementById("confidence").textContent = res.confidence;
+    }
+
+    function loadHistory(){
+      const body = document.getElementById("historyBody");
+      const raw = localStorage.getItem("ew_history");
+      const items = raw ? JSON.parse(raw) : [];
+      body.innerHTML = "";
+      if (!items.length){
+        body.innerHTML = `<tr><td colspan="5" class="small">No saved records yet.</td></tr>`;
+        return;
+      }
+      items.slice().reverse().forEach(item=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(item.ts).toLocaleString()}</td>
+          <td>${escapeHtml(item.project || "—")}</td>
+          <td><b>${item.ewi}</b></td>
+          <td>${escapeHtml(item.status)}</td>
+          <td class="small">${escapeHtml((item.notes||"").slice(0,160))}${(item.notes||"").length>160?"…":""}</td>
+        `;
+        body.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // Buttons
+    document.getElementById("analyzeBtn").addEventListener("click", ()=>{
+      const scores = readScores();
+      const ewi = computeEWI(scores);
+      document.getElementById("ewi").textContent = ewi;
+
+      const top3 = topSignals(scores);
+      renderInsights(top3);
+
+      const res = classify(scores, ewi);
+      setStatusUI(res);
+
+      document.getElementById("path").textContent = escalationPath(scores, ewi);
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", ()=>{
+      const scores = readScores();
+      const ewi = computeEWI(scores);
+      const res = classify(scores, ewi);
+      const project = document.getElementById("projectName").value.trim();
+      const notes = document.getElementById("notes").value.trim();
+
+      const record = {
+        ts: Date.now(),
+        project,
+        experience: document.getElementById("experience").value,
+        scores,
+        ewi,
+        status: res.statusTitle,
+        urgency: res.urgency,
+        confidence: res.confidence,
+        notes
+      };
+
+      const raw = localStorage.getItem("ew_history");
+      const items = raw ? JSON.parse(raw) : [];
+      items.push(record);
+      localStorage.setItem("ew_history", JSON.stringify(items));
+      loadHistory();
+      alert("Saved. (Stored in your browser localStorage)");
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", ()=>{
+      document.getElementById("projectName").value = "";
+      document.getElementById("notes").value = "";
+      document.querySelectorAll(".score").forEach(sel=> sel.value = "3");
+      document.getElementById("ewi").textContent = "—";
+      document.getElementById("confidence").textContent = "—";
+      document.getElementById("urgency").textContent = "—";
+      document.getElementById("statusTitle").textContent = "No analysis yet";
+      document.getElementById("statusDesc").textContent = "Select values and click “Analyze”.";
+      document.getElementById("statusDot").className = "dot info";
+      document.getElementById("path").textContent = "Run analysis to generate a recommended escalation route (e.g., Team Lead → PM → Steering Committee).";
+      document.getElementById("insights").innerHTML = "<span>Top signals will appear here</span>";
+    });
+
+    // init
+    loadHistory();
+  </script>
 </body>
 </html>
